@@ -1,0 +1,39 @@
+🚀 GUÍA RÁPIDA - 5 PASOS PARA SUBIR A RAILWAY
+
+PASO 1: CREAR CUENTAS
+────────────────────
+1. GitHub: https://github.com/signup (gratis)
+2. Railway: https://railway.app/ → "Login with GitHub"
+
+PASO 2: SUBIR ARCHIVOS A GITHUB
+──────────────────────────────
+1. Ve a https://github.com/new
+2. Nombre: "scanqueue-app"
+3. Marca "Add a README"
+4. Haz clic en "Upload files"
+5. Sube TODOS los archivos de: scanqueue_railway.zip
+
+PASO 3: CONECTAR CON RAILWAY
+───────────────────────────
+1. En Railway → "New Project"
+2. Selecciona "Deploy from GitHub repo"
+3. Busca "scanqueue-app" → "Deploy"
+
+PASO 4: ESPERAR Y COPIAR DOMINIO
+───────────────────────────────
+1. Espera 2-3 minutos
+2. Copia el dominio que aparece:
+   Ej: https://scanqueue-app-production.up.railway.app
+
+PASO 5: PROBAR Y USAR
+────────────────────
+1. Clientes: https://tu-dominio.railway.app/customer
+2. Admin: https://tu-dominio.railway.app/admin
+3. Monitor: https://tu-dominio.railway.app/
+
+⚠️ PROBLEMAS COMUNES:
+• Si falla: Revisa "Logs" en Railway
+• Sin QR: Ejecuta en Railway Console:
+  python generate_qr_codes.py --url https://tu-dominio.railway.app
+
+✅ LISTO: Tu sistema está en línea 24/7 con HTTPS gratis!
