@@ -1,0 +1,13 @@
+{
+  "name": "scanqueue-app",
+  "description": "ScanQueue - Sistema de colas en l\u00ednea",
+  "runtime": "python",
+  "python_version": "3.12",
+  "env": {
+    "FLASK_ENV": "production",
+    "PORT": "5000"
+  },
+  "scripts": {
+    "start": "python app.py"
+  }
+}
