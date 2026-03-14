@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScanQueue - 在线排队系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn-large {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .queue-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .queue-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .queue-info {
+            text-align: right;
+        }
+        
+        .queue-info .waiting {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        
+        .queue-info .processing {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            color: white;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 ScanQueue</h1>
+            <p>智能在线排队系统 - 告别物理排队，享受数字便利</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <h2>👤 客户入口</h2>
+                <p>客户可以在这里取号、查看排队状态、接收实时通知。</p>
+                <div style="margin: 25px 0;">
+                    <a href="/customer" class="btn btn-large">进入客户页面</a>
+                </div>
+                <ul class="feature-list">
+                    <li>手机扫码快速取号</li>
+                    <li>实时排队进度查看</li>
+                    <li>预计等待时间显示</li>
+                    <li>叫号提醒通知</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>👨‍💼 管理后台</h2>
+                <p>员工可以管理队列、叫号、查看统计数据。</p>
+                <div style="margin: 25px 0;">
+                    <a href="/admin" class="btn btn-large btn-secondary">进入管理后台</a>
+                </div>
+                <ul class="feature-list">
+                    <li>实时队列监控</li>
+                    <li>一键叫号功能</li>
+                    <li>排队数据分析</li>
+                    <li>多队列管理</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>📊 系统状态</h2>
+                <div id="system-status">
+                    <div class="queue-status">
+                        <div>
+                            <div class="queue-number">--</div>
+                            <div>当前叫号</div>
+                        </div>
+                        <div class="queue-info">
+                            <div>等待中: <span class="waiting">--</span></div>
+                            <div>处理中: <span class="processing">--</span></div>
+                        </div>
+                    </div>
+                    <p>系统运行正常，等待连接...</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button onclick="refreshStatus()" class="btn">刷新状态</button>
+                    <button onclick="testNotification()" class="btn btn-secondary">测试通知</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 使用说明</h3>
+            <ol>
+                <li><strong>客户取号</strong>: 访问客户页面或扫描二维码，选择服务类型后取号</li>
+                <li><strong>远程等待</strong>: 取号后可以离开现场，系统会通过通知提醒</li>
+                <li><strong>实时查看</strong>: 随时查看排队进度和预计等待时间</li>
+                <li><strong>到号提醒</strong>: 轮到您时，系统会发送通知提醒前往</li>
+                <li><strong>管理操作</strong>: 员工在管理后台进行叫号、完成服务等操作</li>
+            </ol>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 ScanQueue 在线排队系统 | 版本 1.0 | 技术支持: support@scanqueue.com</p>
+            <p>系统设计：无需下载APP，手机浏览器即可使用</p>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        // 连接WebSocket服务器
+        const socket = io();
+        
+        socket.on('connect', function() {
+            console.log('已连接到服务器');
+            updateStatus('系统已连接', 'success');
+        });
+        
+        socket.on('connected', function(data) {
+            console.log('服务器消息:', data.message);
+        });
+        
+        socket.on('new_ticket', function(data) {
+            console.log('新号码:', data);
+            showNotification(`新号码: ${data.ticket_number}，${data.customer_name} 已取号`);
+        });
+        
+        socket.on('ticket_called', function(data) {
+            console.log('叫号:', data);
+            showNotification(`请 ${data.customer_name}（${data.ticket_number}）前往 ${data.called_by} 处办理`);
+        });
+        
+        socket.on('ticket_completed', function(data) {
+            console.log('完成:', data);
+            showNotification(`号码 ${data.ticket_number} 已完成服务`);
+        });
+        
+        // 更新系统状态
+        function updateStatus(message, type) {
+            const statusDiv = document.getElementById('system-status');
+            const statusText = statusDiv.querySelector('p');
+            statusText.textContent = message;
+            statusText.style.color = type === 'success' ? '#4CAF50' : '#ff9800';
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('ScanQueue 提醒', {
+                    body: message,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/1077/1077114.png'
+                });
+            } else {
+                // 使用浏览器通知或简单的alert
+                alert(message);
+            }
+        }
+        
+        // 请求通知权限
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    console.log('通知权限:', permission);
+                });
+            }
+        }
+        
+        // 刷新状态
+        function refreshStatus() {
+            fetch('/api/queues')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('队列数据:', data);
+                    updateStatus(`已加载 ${data.length} 个队列`, 'success');
+                })
+                .catch(error => {
+                    console.error('错误:', error);
+                    updateStatus('获取状态失败', 'error');
+                });
+        }
+        
+        // 测试通知
+        function testNotification() {
+            showNotification('这是一个测试通知！ScanQueue 系统运行正常。');
+        }
+        
+        // 页面加载时请求通知权限
+        window.addEventListener('load', function() {
+            requestNotificationPermission();
+            refreshStatus();
+            
+            // 每30秒刷新一次状态
+            setInterval(refreshStatus, 30000);
+        });
+    </script>
+</body>
+</html>
