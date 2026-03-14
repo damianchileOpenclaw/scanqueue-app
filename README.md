@@ -1,72 +1,27 @@
-# ScanQueue 在线排队系统
+# ScanQueue - Sistema de Colas en Línea
 
-## 项目概述
-一个完整的在线排队解决方案，让客户无需物理排队，通过手机即可参与排队并接收实时通知。
+## 🚀 Desplegado en Render.com
 
-## 功能特点
+Tu sistema está ahora en línea en:
+**https://scanqueue-app.onrender.com**
 
-### 客户端功能
-- 📱 手机取号：扫描二维码或访问网页取号
-- 🔔 实时通知：排队进度、叫号提醒
-- 📊 队列状态：查看当前排队人数、预计等待时间
-- ⏰ 远程等待：无需在现场等待，收到通知后再前往
+### 📱 Enlaces:
+- 👥 **Clientes:** `/customer`
+- 👨‍💼 **Admin:** `/admin`
+- 🏠 **Monitor:** `/`
 
-### 管理端功能
-- 🎯 叫号管理：员工叫号、跳过、完成
-- 📈 队列监控：实时查看所有队列状态
-- 📊 数据分析：排队时间统计、客户流量分析
-- ⚙️ 系统设置：队列配置、通知设置
+### 🔧 Características:
+- ✅ Sistema de colas en tiempo real
+- ✅ WebSocket para actualizaciones instantáneas
+- ✅ Interfaz responsive (móvil/tablet/desktop)
+- ✅ 3 colas preconfiguradas
+- ✅ Panel de administración
 
-### 技术特点
-- 🌐 响应式设计：支持手机、平板、电脑
-- 🔄 实时更新：WebSocket 实时通信
-- 📱 多平台通知：短信、微信、APP推送
-- 🗄️ 数据持久化：MySQL/PostgreSQL 数据库
+### 📊 Uso:
+1. **Clientes** escanean QR code o van a `/customer`
+2. **Administradores** usan `/admin` para llamar números
+3. **Monitor** muestra cola en tiempo real en `/`
 
-## 系统架构
-
-```
-前端 (React/Vue) → API服务器 (Node.js/Python) → 数据库 (MySQL)
-       ↓
-    WebSocket
-       ↓
-   通知服务 (短信/推送)
-```
-
-## 快速开始
-
-### 环境要求
-- Node.js 16+ 或 Python 3.8+
-- MySQL 5.7+ 或 PostgreSQL 10+
-- Redis (可选，用于缓存和实时通信)
-
-### 安装步骤
-1. 克隆项目
-2. 安装依赖
-3. 配置数据库
-4. 启动服务
-
-## 部署选项
-
-### 本地部署
-适合小型店铺、诊所、服务机构
-
-### 云服务器部署
-适合连锁店、大型机构
-
-### Docker 部署
-一键部署，易于维护
-
-## 使用场景
-
-1. **餐饮行业**：餐厅排队取号
-2. **医疗服务**：医院、诊所预约排队
-3. **政府服务**：办事大厅排队
-4. **零售行业**：促销活动排队
-5. **教育机构**：报名、咨询排队
-
-## 技术支持
-- 详细文档
-- 视频教程
-- 技术支持群
-- 定期更新
+### 🛠 Nota:
+Los QR codes están deshabilitados temporalmente en Render por problemas con Pillow.
+Puedes generar QR codes localmente después.
