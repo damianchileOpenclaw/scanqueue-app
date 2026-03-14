@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户取号 - ScanQueue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .step {
+            margin-bottom: 40px;
+            padding: 25px;
+            border-radius: 15px;
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+        }
+        
+        .step h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .queue-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .queue-item {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .queue-item:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .queue-item.selected {
+            border-color: #4CAF50;
+            background: #f0f9f0;
+        }
+        
+        .queue-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .queue-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+        
+        .ticket-result {
+            text-align: center;
+            padding: 30px;
+            background: #f0f9f0;
+            border-radius: 15px;
+            border: 2px solid #4CAF50;
+            margin-top: 30px;
+        }
+        
+        .ticket-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            letter-spacing: 2px;
+        }
+        
+        .ticket-info {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .status-waiting {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-processing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .qr-code {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .qr-code img {
+            max-width: 200px;
+            border: 10px solid white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .notification.error {
+            border-left-color: #ff416c;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .ticket-number {
+                font-size: 2rem;
+            }
+            
+            .queue-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 客户取号</h1>
+            <p>选择服务类型，获取排队号码，实时查看进度</p>
+        </div>
+        
+        <div class="content">
+            <!-- 步骤1: 选择队列 -->
+            <div class="step" id="step1">
+                <h2><span class="step-number">1</span> 选择服务类型</h2>
+                <p>请选择您需要的服务类型：</p>
+                <div class="queue-list" id="queueList">
+                    <!-- 队列将通过JavaScript动态加载 -->
+                    <div class="queue-item" style="text-align: center; padding: 40px;">
+                        <div class="loading">加载队列中...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤2: 填写信息 -->
+            <div class="step" id="step2" style="display: none;">
+                <h2><span class="step-number">2</span> 填写信息（可选）</h2>
+                <div class="form-group">
+                    <label for="customerName">您的姓名（可选）</label>
+                    <input type="text" id="customerName" class="form-control" placeholder="请输入您的姓名">
+                </div>
+                <div class="form-group">
+                    <label for="phone">手机号码（可选，用于接收通知）</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="请输入手机号码">
+                </div>
+                <div class="selected-queue-info" id="selectedQueueInfo" style="margin-bottom: 20px; padding: 15px; background: #e8f4ff; border-radius: 10px;">
+                    <strong>已选择：</strong> <span id="selectedQueueName">--</span>
+                </div>
+                <button class="btn" onclick="takeTicket()">获取排队号码</button>
+                <button class="btn" onclick="backToStep1()" style="margin-top: 10px; background: #6c757d;">返回上一步</button>
+            </div>
+            
+            <!-- 步骤3: 显示号码 -->
+            <div class="step" id="step3" style="display: none;">
+                <div class="ticket-result">
+                    <h2>✅ 取号成功！</h2>
+                    <div class="ticket-number" id="ticketNumberDisplay">--</div>
+                    <div class="ticket-info">
+                        <p>请保存好您的排队号码，系统会实时更新排队进度。</p>
+                        <p>预计等待时间：<strong id="waitTime">--</strong> 分钟</p>
+                        <p>前面还有 <strong id="aheadCount">--</strong> 人等待</p>
+                    </div>
+                    <div class="status-badge status-waiting" id="ticketStatus">等待中</div>
+                    
+                    <div class="qr-code">
+                        <p><strong>扫描二维码查看排队状态：</strong></p>
+                        <div id="qrcode"></div>
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">或访问：<span id="statusUrl"></span></p>
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <button class="btn btn-secondary" onclick="checkStatus()">刷新排队状态</button>
+                        <button class="btn" onclick="newTicket()" style="margin-top: 10px;">再取一个号码</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 10px;">
+                    <h3>📢 温馨提示</h3>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li>您可以在任何地方等待，无需在现场排队</li>
+                        <li>系统会在轮到您时发送通知提醒</li>
+                        <li>请关注屏幕上的叫号信息</li>
+                        <li>过号请重新取号</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 状态查看区域 -->
+            <div id="statusArea" style="display: none; margin-top: 30px;">
+                <h3>📊 实时排队状态</h3>
+                <div id="currentStatus" style="padding: 20px; background: #f8f9fa; border-radius: 10px; margin-top: 15px;">
+                    加载中...
+                </div>
+            </div>
+            
+            <div class="back-link">
+                <a href="/">← 返回首页</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 通知区域 -->
+    <div class="notification" id="notification"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script>
+        let selectedQueueId = null;
+        let currentTicketNumber = null;
+        const socket = io();
+        
+        // 页面加载时加载队列
+        window.addEventListener('load', function() {
+            loadQueues();
+            requestNotificationPermission();
+        });
+        
+        // 加载队列列表
+        function loadQueues() {
+            fetch('/api/queues')
+                .then(response => response.json())
+                .then(queues => {
+                    const queueList = document.getElementById('queueList');
+                    queueList.innerHTML = '';
+                    
+                    queues.forEach(queue => {
+                        const queueItem = document.createElement('div');
+                        queueItem.className = 'queue-item';
+                        queueItem.innerHTML = `
+                            <div class="queue-name">${queue.name}</div>
+                            <div class="queue-desc">${queue.description || '常规服务'}</div>
+                        `;
+                        queueItem.addEventListener('click', () => selectQueue(queue.id, queue.name));
+                        queueList.appendChild(queueItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('加载队列失败:', error);
+                    showNotification('加载队列失败，请刷新页面重试', 'error');
+                });
+        }
+        
+        // 选择队列
+        function selectQueue(queueId, queueName) {
+            selectedQueueId = queueId;
+            
+            // 更新UI显示选中的队列
+            document.querySelectorAll('.queue-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.target.closest('.queue-item').classList.add('selected');
+            
+            // 显示下一步
+            document.getElementById('selectedQueueName').textContent = queueName;
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        }
+        
+        // 返回上一步
+        function backToStep1() {
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step1').style.display = 'block';
+            selectedQueueId = null;
+        }
+        
+        // 取号
+        function takeTicket() {
+            const customerName = document.getElementById('customerName').value || '匿名客户';
+            const phone = document.getElementById('phone').value || '';
+            
+            if (!selectedQueueId) {
+                showNotification('请选择服务类型', 'error');
+                return;
+            }
+            
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '正在取号...';
+            
+            fetch('/api/ticket/take', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    queue_id: selectedQueueId,
+                    customer_name: customerName,
+                    phone: phone
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentTicketNumber = data.ticket_number;
+                    showTicketResult(data);
+                } else {
+                    showNotification(data.error || '取号失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('取号错误:', error);
+                showNotification('网络错误，请重试', 'error');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = '获取排队号码';
+            });
+        }
+        
+        // 显示取号结果
+        function showTicketResult(data) {
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'block';
+            document.getElementById('statusArea').style.display = 'block';
+            
+            document.getElementById('ticketNumberDisplay').textContent = data.ticket_number;
+            document.getElementById('waitTime').textContent = data.estimated_wait_time;
+            document.getElementById('aheadCount').textContent = Math.floor(data.estimated_wait_time / 3);
+            
+            // 生成二维码
+            const statusUrl = `${window.location.origin}/api/ticket/status/${data.ticket_number}`;
+            document.getElementById('statusUrl').textContent = statusUrl;
+            
+            QRCode.toCanvas(document.getElementById('qrcode'), statusUrl, {
+                width: 200,
+                margin: 1,
+                color: {
+                    dark: '#667eea',
+                    light: '#ffffff'
+                }
+            }, function(error) {
+                if (error) console.error('生成二维码失败:', error);
+            });
+            
+            // 开始轮询状态
+            startStatusPolling(data.ticket_number);
+            
+            showNotification(data.message, 'success');
+        }
+        
+        // 开始轮询状态
+        function startStatusPolling(ticketNumber) {
+            // 立即检查一次状态
+            checkTicketStatus(ticketNumber);
+            
+            // 每30秒检查一次状态
+            setInterval(() => checkTicketStatus(ticketNumber), 30000);
+        }
+        
+        // 检查票状态
+        function checkTicketStatus(ticketNumber) {
+            fetch(`/api/ticket/status/${ticketNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('ticketStatus').textContent = '号码不存在';
+                        document.getElementById('ticketStatus').className = 'status-badge status-waiting';
+                        return;
+                    }
+                    
+                    // 更新状态
+                    const statusBadge = document.getElementById('ticketStatus');
+                    statusBadge.textContent = getStatusText(data.status);
+                    
+                    if (data.status === 'waiting') {
+                        statusBadge.className = 'status-badge status-waiting';
+                        document.getElementById('aheadCount').textContent = data.ahead_count;
+                        document.getElementById('waitTime').textContent = data.estimated_wait_time;
+                    } else if (data.status === 'calling') {
+                        statusBadge.className = 'status-badge status-processing';
+                        showNotification(`请 ${data.customer_name}（${ticketNumber}）前往办理！`, 'success');
+                    } else if (data.status === 'completed') {
+                        statusBadge.textContent = '已完成';
+                        statusBadge.className = 'status-badge';
+                        statusBadge.style.background = '#d4edda';
+                        statusBadge.style.color = '#155724';
+                    }
+                    
+                    // 更新状态区域
+                    updateStatusArea(data);
+                })
+                .catch(error => {
+                    console.error('检查状态失败:', error);
+                });
+        }
+        
+        // 获取状态文本
+        function getStatusText(status) {
+            const statusMap = {
+                'waiting': '等待中',
+                'calling': '正在叫号',
+                'completed': '已完成'
+            };
+            return statusMap[status] || status;
+        }
+        
+        // 更新状态区域
+        function updateStatusArea(data) {
+            const statusArea = document.getElementById('currentStatus');
+            let html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="padding: 15px; background: white; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: #666;">排队号码</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #667eea;">${data.ticket_number}</div>
+                    </div>
+                    <div style="padding: 15px; background: white; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: #666;">当前状态</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #333;">${getStatusText(data.status)}</div>
+                    </div>
+                    <div style="padding: 15px; background: white; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: #666;">前面人数</div>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: #ff9800;">${data.ahead_count || 0}</div>
+                    </div>
+                    <div style="padding: 15px; background: white; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 0.9rem; color: #666;">预计等待</div>
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #333;">${data.estimated_wait_time || 0} 分钟</div>
+                    </div>
+                </div>
+            `;
+            
+            if (data.called_at) {
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: #e8f4ff; border-radius: 10px;">
+                        <strong>叫号时间：</strong>${new Date(data.called_at).toLocaleString()}
+                    </div>
+                `;
+            }
+            
+            statusArea.innerHTML = html;
+        }
+        
+        // 检查状态按钮
+        function checkStatus() {
+            if (currentTicketNumber) {
+                checkTicketStatus(currentTicketNumber);
+                showNotification('已刷新排队状态', 'success');
+            }
+        }
+        
+        // 再取一个号码
+        function newTicket() {
+            document.getElementById('step3').style.display = 'none';
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('statusArea').style.display = 'none';
+            currentTicketNumber = null;
+            
+            // 重置表单
+            document.getElementById('customerName').value = '';
+            document.getElementById('phone').value = '';
+            selectedQueueId = null;
+            
+            // 重新加载队列
+            loadQueues();
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type === 'error' ? 'error' : ''}`;
+            notification.style.display = 'block';
+            
+            // 3秒后隐藏
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+            
+            // 如果浏览器支持通知，也发送系统通知
+            if (type === 'success' && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification('ScanQueue 提醒', {
+                    body: message,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/1077/1077114.png'
+                });
+            }
+        }
+        
+        // 请求通知权限
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+        
+        // WebSocket 监听叫号
+        socket.on('ticket_called', function(data) {
+            if (currentTicketNumber && data.ticket_number === currentTicketNumber) {
+                showNotification(`请 ${data.customer_name}（${data.ticket_number}）前往 ${data.called_by} 处办理！`, 'success');
+                checkTicketStatus(currentTicketNumber);
+            }
+        });
+        
+        socket.on('ticket_completed', function(data) {
+            if (currentTicketNumber && data.ticket_number === currentTicketNumber) {
+                showNotification(`您的服务已完成，感谢使用！`, 'success');
+                checkTicketStatus(currentTicketNumber);
+            }
+        });
