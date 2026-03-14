@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ScanQueue 在线排队系统 - 版本 simplificada para Render
+ScanQueue 在线排队系统 - 版本 fixed para Render
 """
 
 from flask import Flask, render_template, request, jsonify, session
@@ -309,4 +309,5 @@ if __name__ == '__main__':
     print("="*50)
     
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port, debug=False)
+    # FIX: Agregar allow_unsafe_werkzeug=True para producción
+    socketio.run(app, host='0.0.0.0', port=port, debug=False, allow_unsafe_werkzeug=True)
