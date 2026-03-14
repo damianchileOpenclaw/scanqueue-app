@@ -2,5 +2,5 @@ Flask==2.3.3
 Flask-SocketIO==5.3.6
 python-socketio==5.10.0
 eventlet==0.33.3
-qrcode==7.4.2
-Pillow==10.0.0
+# QR codes deshabilitados temporalmente para Render
+# Se pueden generar QR codes localmente después
